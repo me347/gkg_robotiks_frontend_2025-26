@@ -16,11 +16,9 @@
   <div id="status">Status: Disconnected</div>
 
   <script>
-    // ===== CONFIG =====
-    const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws"; // Use secure WebSocket
+    const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws"; // ✅ WSS
     const statusDiv = document.getElementById("status");
 
-    // ===== OPEN WEBSOCKET =====
     const socket = new WebSocket(WS_URL);
 
     socket.onopen = () => {
@@ -43,21 +41,20 @@
       console.error("WebSocket error:", err);
     };
 
-    // ===== BUTTONS =====
     document.getElementById("onBtn").addEventListener("click", () => {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.send("on");
-      } else {
-        console.warn("WebSocket not open yet!");
-      }
+      fetch("/command", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "on" })
+      });
     });
 
     document.getElementById("offBtn").addEventListener("click", () => {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.send("off");
-      } else {
-        console.warn("WebSocket not open yet!");
-      }
+      fetch("/command", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "off" })
+      });
     });
   </script>
 </body>
