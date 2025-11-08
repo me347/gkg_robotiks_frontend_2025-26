@@ -16,7 +16,7 @@
   <div id="status">Status: Disconnected</div>
 
   <script>
-    const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws"; // Secure WebSocket
+    const WS_URL = "ws://gkg-robotiks-2025-26.onrender.com/ws"; // plain WebSocket
     const statusDiv = document.getElementById("status");
 
     const socket = new WebSocket(WS_URL);
