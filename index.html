@@ -13,45 +13,24 @@
   <h1>ESP32 Controller</h1>
   <button id="onBtn">Turn ON</button>
   <button id="offBtn">Turn OFF</button>
-  <div id="status">Status: Disconnected</div>
+  <div id="status">Status: Ready</div>
 
   <script>
-    const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws";
     const statusDiv = document.getElementById("status");
 
-    // Open WebSocket connection to ESP32
-    const socket = new WebSocket(WS_URL);
-
-    socket.onopen = () => {
-      statusDiv.textContent = "Status: Connected";
-      console.log("WebSocket connected!");
-    };
-
-    socket.onmessage = (event) => {
-      console.log("Message from ESP32:", event.data);
-      statusDiv.textContent = "Status: " + event.data;
-    };
-
-    socket.onclose = () => {
-      statusDiv.textContent = "Status: Disconnected";
-      console.log("WebSocket disconnected");
-    };
-
-    socket.onerror = (err) => {
-      statusDiv.textContent = "Status: Error";
-      console.error("WebSocket error:", err);
-    };
-
-    // Send commands via HTTP POST (buttons)
     async function sendCommand(cmd) {
+      statusDiv.textContent = "Status: Sending...";
       try {
-        await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
+        const res = await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: cmd })
         });
+        const data = await res.json();
+        statusDiv.textContent = `Status: Sent "${data.command}"`;
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Error sending command:", err);
+        statusDiv.textContent = "Status: Error sending command";
       }
     }
 
