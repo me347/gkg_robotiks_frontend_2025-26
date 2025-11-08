@@ -16,9 +16,11 @@
   <div id="status">Status: Disconnected</div>
 
   <script>
-    const WS_URL = "ws://gkg-robotiks-2025-26.onrender.com/ws"; // plain WebSocket
+    // ===== CONFIG =====
+    const WS_URL = "ws://gkg-robotiks-2025-26.onrender.com/ws"; // Plain WebSocket URL
     const statusDiv = document.getElementById("status");
 
+    // ===== OPEN WEBSOCKET =====
     const socket = new WebSocket(WS_URL);
 
     socket.onopen = () => {
@@ -28,6 +30,7 @@
 
     socket.onmessage = (event) => {
       console.log("Message from server:", event.data);
+      // Optionally display any server message
       statusDiv.textContent = "Status: " + event.data;
     };
 
@@ -41,20 +44,17 @@
       console.error("WebSocket error:", err);
     };
 
+    // ===== BUTTONS =====
     document.getElementById("onBtn").addEventListener("click", () => {
-      fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "on" })
-      });
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send("on"); // Send command to backend/ESP32
+      }
     });
 
     document.getElementById("offBtn").addEventListener("click", () => {
-      fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "off" })
-      });
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send("off"); // Send command to backend/ESP32
+      }
     });
   </script>
 </body>
