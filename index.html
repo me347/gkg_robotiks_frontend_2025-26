@@ -17,7 +17,7 @@
 
   <script>
     // ===== CONFIG =====
-    const WS_URL = "ws://gkg-robotiks-2025-26.onrender.com/ws"; // Plain WebSocket URL
+    const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws"; // Use secure WebSocket
     const statusDiv = document.getElementById("status");
 
     // ===== OPEN WEBSOCKET =====
@@ -30,7 +30,6 @@
 
     socket.onmessage = (event) => {
       console.log("Message from server:", event.data);
-      // Optionally display any server message
       statusDiv.textContent = "Status: " + event.data;
     };
 
@@ -47,13 +46,17 @@
     // ===== BUTTONS =====
     document.getElementById("onBtn").addEventListener("click", () => {
       if (socket.readyState === WebSocket.OPEN) {
-        socket.send("on"); // Send command to backend/ESP32
+        socket.send("on");
+      } else {
+        console.warn("WebSocket not open yet!");
       }
     });
 
     document.getElementById("offBtn").addEventListener("click", () => {
       if (socket.readyState === WebSocket.OPEN) {
-        socket.send("off"); // Send command to backend/ESP32
+        socket.send("off");
+      } else {
+        console.warn("WebSocket not open yet!");
       }
     });
   </script>
