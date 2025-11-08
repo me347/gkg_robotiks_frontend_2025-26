@@ -15,13 +15,15 @@
   <button id="offBtn">Turn OFF</button>
   <div id="status">Status: Ready</div>
 
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     const statusDiv = document.getElementById("status");
 
+    // HTTP POST for buttons
     async function sendCommand(cmd) {
       statusDiv.textContent = "Status: Sending...";
       try {
-        const res = await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
+        const res = await fetch("/command", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: cmd })
