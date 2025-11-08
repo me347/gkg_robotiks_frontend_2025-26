@@ -2,50 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ESP32 Control</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-    button { font-size: 24px; padding: 15px 30px; margin: 10px; }
-    #status { margin-top: 20px; font-weight: bold; }
-  </style>
+  <title>ESP32 Controller</title>
 </head>
 <body>
-
-  <h1>ESP32 Control Panel</h1>
-
+  <h1>ESP32 Controller</h1>
   <button id="onBtn">Turn ON</button>
   <button id="offBtn">Turn OFF</button>
+  <div id="status">Status: Disconnected</div>
 
-  <div id="status">Current command: none</div>
-
-  <!-- Socket.IO client -->
-  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
   <script>
+    const WS_URL = "ws://gkg-robotiks-2025-26.onrender.com/ws"; // Plain WebSocket URL
     const statusDiv = document.getElementById("status");
-    const socket = io("https://gkg-robotiks-2025-26.onrender.com");
 
-    // Listen for real-time command updates
-    socket.on("command_update", (data) => {
-      statusDiv.textContent = "Current command: " + data.command;
-      console.log("Received command:", data.command);
+    // Open WebSocket connection
+    const socket = new WebSocket(WS_URL);
+
+    socket.onopen = () => {
+      statusDiv.textContent = "Status: Connected";
+      console.log("WebSocket connected!");
+    };
+
+    socket.onmessage = (event) => {
+      console.log("Message from server:", event.data);
+      statusDiv.textContent = "Status: " + event.data;
+    };
+
+    socket.onclose = () => {
+      statusDiv.textContent = "Status: Disconnected";
+      console.log("WebSocket disconnected");
+    };
+
+    socket.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    // Send commands when buttons are clicked
+    document.getElementById("onBtn").addEventListener("click", () => {
+      socket.send("on");
     });
 
-    // Send POST request to backend when button is pressed
-    async function sendCommand(action) {
-      try {
-        await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action })
-        });
-      } catch (err) {
-        console.error("Error sending command:", err);
-      }
-    }
-
-    document.getElementById("onBtn").addEventListener("click", () => sendCommand("on"));
-    document.getElementById("offBtn").addEventListener("click", () => sendCommand("off"));
+    document.getElementById("offBtn").addEventListener("click", () => {
+      socket.send("off");
+    });
   </script>
-
 </body>
 </html>
