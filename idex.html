@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h3>ESP32 Control</h3>
+  <button onclick="sendCommand('on')">ON</button>
+  <button onclick="sendCommand('off')">OFF</button>
+
+  <script>
+    const api = 'https://gkg-robotiks-2025-26.onrender.com/command';
+
+    async function sendCommand(action) {
+      await fetch(api, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action})
+      });
+      alert('Command sent: ' + action);
+    }
+  </script>
+</body>
+</html>
