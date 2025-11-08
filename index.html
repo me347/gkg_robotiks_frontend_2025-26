@@ -19,7 +19,7 @@
     const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws";
     const statusDiv = document.getElementById("status");
 
-    // WebSocket connection
+    // Open WebSocket connection to ESP32
     const socket = new WebSocket(WS_URL);
 
     socket.onopen = () => {
@@ -28,7 +28,7 @@
     };
 
     socket.onmessage = (event) => {
-      console.log("Message from server:", event.data);
+      console.log("Message from ESP32:", event.data);
       statusDiv.textContent = "Status: " + event.data;
     };
 
@@ -42,18 +42,16 @@
       console.error("WebSocket error:", err);
     };
 
-    // Send POST to backend when buttons are clicked
+    // Send commands via HTTP POST (buttons)
     async function sendCommand(cmd) {
       try {
-        const res = await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
+        await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: cmd })
         });
-        const data = await res.json();
-        console.log("Backend response:", data);
       } catch (err) {
-        console.error("Error sending command:", err);
+        console.error("Fetch error:", err);
       }
     }
 
