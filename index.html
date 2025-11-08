@@ -1,35 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>ESP32 Control</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    button { font-size: 24px; padding: 15px 30px; margin: 10px; }
+    #status { margin-top: 20px; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <h2>ESP32 Control Panel</h2>
-  <button onclick="sendCommand('on')">Turn ON</button>
-  <button onclick="sendCommand('off')">Turn OFF</button>
-  <p id="status">Waiting for command...</p>
 
+  <h1>ESP32 Control Panel</h1>
+
+  <button id="onBtn">Turn ON</button>
+  <button id="offBtn">Turn OFF</button>
+
+  <div id="status">Current command: none</div>
+
+  <!-- Socket.IO client -->
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
   <script>
-    const apiUrl = "https://gkg-robotiks-2025-26.onrender.com/command";
+    const statusDiv = document.getElementById("status");
+    const socket = io("https://gkg-robotiks-2025-26.onrender.com");
 
+    // Listen for real-time command updates
+    socket.on("command_update", (data) => {
+      statusDiv.textContent = "Current command: " + data.command;
+      console.log("Received command:", data.command);
+    });
+
+    // Send POST request to backend when button is pressed
     async function sendCommand(action) {
       try {
-        const response = await fetch(apiUrl, {
+        await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action })
         });
-        const data = await response.json();
-        document.getElementById("status").innerText = "Sent command: " + data.command;
-        console.log("Response:", data);
       } catch (err) {
         console.error("Error sending command:", err);
-        document.getElementById("status").innerText = "Error sending command";
       }
     }
+
+    document.getElementById("onBtn").addEventListener("click", () => sendCommand("on"));
+    document.getElementById("offBtn").addEventListener("click", () => sendCommand("off"));
   </script>
+
 </body>
 </html>
