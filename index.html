@@ -16,9 +16,12 @@
   <div id="status">Status: Disconnected</div>
 
   <script>
-    const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws"; // Secure WebSocket
+    // ===== CONFIG =====
+    const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws"; // WSS for secure WebSocket
+    const BACKEND_URL = "https://gkg-robotiks-2025-26.onrender.com/command"; // Backend POST endpoint
     const statusDiv = document.getElementById("status");
 
+    // ===== OPEN WEBSOCKET =====
     const socket = new WebSocket(WS_URL);
 
     socket.onopen = () => {
@@ -41,21 +44,27 @@
       console.error("WebSocket error:", err);
     };
 
-    // Button actions
+    // ===== BUTTONS =====
     document.getElementById("onBtn").addEventListener("click", () => {
-      fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
+      fetch(BACKEND_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "on" })
-      });
+      })
+      .then(res => res.json())
+      .then(data => console.log("POST response:", data))
+      .catch(err => console.error("POST error:", err));
     });
 
     document.getElementById("offBtn").addEventListener("click", () => {
-      fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
+      fetch(BACKEND_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "off" })
-      });
+      })
+      .then(res => res.json())
+      .then(data => console.log("POST response:", data))
+      .catch(err => console.error("POST error:", err));
     });
   </script>
 </body>
