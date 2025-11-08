@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>ESP32 Controller</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    button { font-size: 18px; margin: 10px; padding: 10px 20px; }
+    #status { margin-top: 20px; font-weight: bold; }
+  </style>
 </head>
 <body>
   <h1>ESP32 Controller</h1>
@@ -11,10 +16,11 @@
   <div id="status">Status: Disconnected</div>
 
   <script>
+    // ===== CONFIG =====
     const WS_URL = "ws://gkg-robotiks-2025-26.onrender.com/ws"; // Plain WebSocket URL
     const statusDiv = document.getElementById("status");
 
-    // Open WebSocket connection
+    // ===== OPEN WEBSOCKET =====
     const socket = new WebSocket(WS_URL);
 
     socket.onopen = () => {
@@ -24,6 +30,7 @@
 
     socket.onmessage = (event) => {
       console.log("Message from server:", event.data);
+      // Optional: update status div with message
       statusDiv.textContent = "Status: " + event.data;
     };
 
@@ -33,16 +40,21 @@
     };
 
     socket.onerror = (err) => {
+      statusDiv.textContent = "Status: Error";
       console.error("WebSocket error:", err);
     };
 
-    // Send commands when buttons are clicked
+    // ===== BUTTONS =====
     document.getElementById("onBtn").addEventListener("click", () => {
-      socket.send("on");
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send("on");
+      }
     });
 
     document.getElementById("offBtn").addEventListener("click", () => {
-      socket.send("off");
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send("off");
+      }
     });
   </script>
 </body>
