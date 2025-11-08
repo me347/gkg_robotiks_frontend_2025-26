@@ -19,7 +19,7 @@
     const WS_URL = "wss://gkg-robotiks-2025-26.onrender.com/ws";
     const statusDiv = document.getElementById("status");
 
-    // Open WebSocket connection
+    // WebSocket connection
     const socket = new WebSocket(WS_URL);
 
     socket.onopen = () => {
@@ -42,22 +42,23 @@
       console.error("WebSocket error:", err);
     };
 
-    // Send POST request to backend when buttons are clicked
-    document.getElementById("onBtn").addEventListener("click", () => {
-      fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "on" })
-      });
-    });
+    // Send POST to backend when buttons are clicked
+    async function sendCommand(cmd) {
+      try {
+        const res = await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: cmd })
+        });
+        const data = await res.json();
+        console.log("Backend response:", data);
+      } catch (err) {
+        console.error("Error sending command:", err);
+      }
+    }
 
-    document.getElementById("offBtn").addEventListener("click", () => {
-      fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "off" })
-      });
-    });
+    document.getElementById("onBtn").addEventListener("click", () => sendCommand("on"));
+    document.getElementById("offBtn").addEventListener("click", () => sendCommand("off"));
   </script>
 </body>
 </html>
