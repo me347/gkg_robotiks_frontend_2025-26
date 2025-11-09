@@ -15,15 +15,15 @@
   <button id="offBtn">Turn OFF</button>
   <div id="status">Status: Ready</div>
 
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
   <script>
     const statusDiv = document.getElementById("status");
 
-    // HTTP POST for buttons
+    // Send command via POST
     async function sendCommand(cmd) {
       statusDiv.textContent = "Status: Sending...";
       try {
-        const res = await fetch("/command", {
+        const res = await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: cmd })
@@ -38,6 +38,14 @@
 
     document.getElementById("onBtn").addEventListener("click", () => sendCommand("on"));
     document.getElementById("offBtn").addEventListener("click", () => sendCommand("off"));
+
+    // Optional: WebSocket to receive live updates from ESP32
+    const socket = io("https://gkg-robotiks-2025-26.onrender.com");
+    socket.on("connect", () => console.log("WebSocket connected"));
+    socket.on("command", (data) => {
+      console.log("Received command from backend:", data);
+      statusDiv.textContent = `Status: Command ${data.action} received`;
+    });
   </script>
 </body>
 </html>
