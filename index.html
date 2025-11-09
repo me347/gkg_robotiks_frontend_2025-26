@@ -1,53 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ESP32 Controller</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    button { font-size: 18px; margin: 10px; padding: 10px 20px; }
-    #status { margin-top: 20px; font-weight: bold; }
-  </style>
+<meta charset="UTF-8">
+<title>ESP32 Controller</title>
+<style>
+  body { font-family: Arial; text-align: center; margin-top: 50px; }
+  button { font-size: 18px; margin: 10px; padding: 10px 20px; }
+  #status { margin-top: 20px; font-weight: bold; }
+</style>
 </head>
 <body>
-  <h1>ESP32 Controller</h1>
-  <button id="onBtn">Turn ON</button>
-  <button id="offBtn">Turn OFF</button>
-  <div id="status">Status: Ready</div>
+<h1>ESP32 Controller</h1>
+<button id="onBtn">Turn ON</button>
+<button id="offBtn">Turn OFF</button>
+<div id="status">Status: Ready</div>
 
-  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-  <script>
-    const statusDiv = document.getElementById("status");
-    const socket = io("https://gkg-robotiks-2025-26.onrender.com"); // Backend URL
+<script>
+const statusDiv = document.getElementById("status");
 
-    socket.on("connect", () => {
-      statusDiv.textContent = "Status: Connected to server";
-      console.log("SocketIO connected");
+async function sendCommand(cmd) {
+  statusDiv.textContent = "Status: Sending...";
+  try {
+    const res = await fetch("http://YOUR_BACKEND_IP:8080/command", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: cmd })
     });
+    const data = await res.json();
+    statusDiv.textContent = `Status: Sent "${data.command}"`;
+  } catch (err) {
+    console.error("Error sending command:", err);
+    statusDiv.textContent = "Status: Error sending command";
+  }
+}
 
-    socket.on("disconnect", () => {
-      statusDiv.textContent = "Status: Disconnected";
-      console.log("SocketIO disconnected");
-    });
-
-    async function sendCommand(cmd) {
-      statusDiv.textContent = "Status: Sending...";
-      try {
-        const res = await fetch("https://gkg-robotiks-2025-26.onrender.com/command", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: cmd })
-        });
-        const data = await res.json();
-        statusDiv.textContent = `Status: Sent "${data.command}"`;
-      } catch (err) {
-        console.error("Error sending command:", err);
-        statusDiv.textContent = "Status: Error sending command";
-      }
-    }
-
-    document.getElementById("onBtn").addEventListener("click", () => sendCommand("on"));
-    document.getElementById("offBtn").addEventListener("click", () => sendCommand("off"));
-  </script>
+document.getElementById("onBtn").addEventListener("click", () => sendCommand("on"));
+document.getElementById("offBtn").addEventListener("click", () => sendCommand("off"));
+</script>
 </body>
 </html>
